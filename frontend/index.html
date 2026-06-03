@@ -16,80 +16,81 @@
   <div class="portal-container">
     <header class="portal-header">
       <div class="logo">NEXUS <span>CRM</span></div>
-      <div class="backend-select-wrapper">
-        <label for="backend-toggle">Backend:</label>
-        <select id="backend-toggle" class="select-field">
-          <option value="http://localhost:8000">FastAPI (8000)</option>
-          <option value="http://localhost:3000">Express (3000)</option>
+      <div class="lang-select-wrapper">
+        <label for="lang-toggle" data-i18n="language-label">Language:</label>
+        <select id="lang-toggle" class="select-field">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
         </select>
       </div>
     </header>
 
     <main class="portal-main">
       <div class="glass-card auth-card" id="login-card">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Enter your credentials to access the tracking portal</p>
+        <h2 data-i18n="welcome-back">Welcome Back</h2>
+        <p class="subtitle" data-i18n="enter-credentials">Enter your credentials to access the tracking portal</p>
         <div id="login-error" class="error-msg hidden"></div>
         <form id="login-form">
           <div class="input-group">
-            <label for="login-email">Email Address</label>
-            <input type="email" id="login-email" required placeholder="name@domain.com">
+            <label for="login-email" data-i18n="email-address">Email Address</label>
+            <input type="email" id="login-email" required data-i18n-placeholder="placeholder-email" placeholder="name@domain.com">
           </div>
           <div class="input-group">
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" required placeholder="••••••••">
+            <label for="login-password" data-i18n="password">Password</label>
+            <input type="password" id="login-password" required data-i18n-placeholder="placeholder-password" placeholder="••••••••">
           </div>
-          <button type="submit" class="btn btn-primary">Sign In</button>
+          <button type="submit" class="btn btn-primary" data-i18n="sign-in">Sign In</button>
         </form>
         <div class="auth-switch">
-          Don't have an account? <span id="to-register-btn">Create one</span>
+          <span data-i18n="no-account">Don't have an account?</span> <span id="to-register-btn" data-i18n="create-one">Create one</span>
         </div>
       </div>
 
       <div class="glass-card auth-card hidden" id="register-card">
-        <h2>Create Account</h2>
-        <p class="subtitle">Join the Nexus student tracker network</p>
+        <h2 data-i18n="create-account">Create Account</h2>
+        <p class="subtitle" data-i18n="join-network">Join the Nexus student tracker network</p>
         <div id="register-error" class="error-msg hidden"></div>
         <form id="register-form">
           <div class="input-row">
             <div class="input-group">
-              <label for="reg-first-name">First Name</label>
-              <input type="text" id="reg-first-name" required placeholder="John">
+              <label for="reg-first-name" data-i18n="first-name">First Name</label>
+              <input type="text" id="reg-first-name" required data-i18n-placeholder="placeholder-firstname" placeholder="John">
             </div>
             <div class="input-group">
-              <label for="reg-last-name">Last Name</label>
-              <input type="text" id="reg-last-name" required placeholder="Doe">
+              <label for="reg-last-name" data-i18n="last-name">Last Name</label>
+              <input type="text" id="reg-last-name" required data-i18n-placeholder="placeholder-lastname" placeholder="Doe">
             </div>
           </div>
           <div class="input-group">
-            <label for="reg-email">Email Address</label>
-            <input type="email" id="reg-email" required placeholder="name@domain.com">
+            <label for="reg-email" data-i18n="email-address">Email Address</label>
+            <input type="email" id="reg-email" required data-i18n-placeholder="placeholder-email" placeholder="name@domain.com">
           </div>
           <div class="input-group">
-            <label for="reg-password">Password</label>
-            <input type="password" id="reg-password" required placeholder="••••••••">
+            <label for="reg-password" data-i18n="password">Password</label>
+            <input type="password" id="reg-password" required data-i18n-placeholder="placeholder-password" placeholder="••••••••">
           </div>
           <div class="input-group">
-            <label for="reg-role">Portal Role</label>
+            <label for="reg-role" data-i18n="portal-role">Portal Role</label>
             <select id="reg-role" class="select-field">
-              <option value="STUDENT">Student</option>
-              <option value="TEACHER">Teacher</option>
-              <option value="COORDINATOR">Coordinator</option>
+              <option value="STUDENT" data-i18n="role-student">Student</option>
+              <option value="TEACHER" data-i18n="role-teacher">Teacher</option>
+              <option value="COORDINATOR" data-i18n="role-coordinator">Coordinator</option>
             </select>
           </div>
           <div class="input-group" id="student-id-wrapper">
-            <label for="reg-student-id">Student ID / JSN (12 Digits)</label>
-            <input type="text" id="reg-student-id" placeholder="123456789012" maxlength="12">
+            <label for="reg-student-id" data-i18n="student-id-label">Student ID / JSN (12 Digits)</label>
+            <input type="text" id="reg-student-id" data-i18n-placeholder="placeholder-studentid" placeholder="123456789012" maxlength="12">
           </div>
-          <button type="submit" class="btn btn-primary">Register</button>
+          <button type="submit" class="btn btn-primary" data-i18n="register-btn">Register</button>
         </form>
         <div class="auth-switch">
-          Already registered? <span id="to-login-btn">Sign in</span>
+          <span data-i18n="already-registered">Already registered?</span> <span id="to-login-btn" data-i18n="sign-in-link">Sign in</span>
         </div>
       </div>
     </main>
   </div>
 
+  <script src="translations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

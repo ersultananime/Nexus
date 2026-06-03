@@ -1,3 +1,19 @@
+function t(key) {
+  const lang = localStorage.getItem("nexus_lang") || "en";
+  return (window.translations[lang] && window.translations[lang][key]) || key;
+}
+
+function translatePage() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    el.setAttribute("placeholder", t(key));
+  });
+}
+
 const state = {
   backendUrl: localStorage.getItem("nexus_backend_url") || "http://localhost:8000",
   token: localStorage.getItem("nexus_token") || null,
@@ -54,6 +70,16 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.reload();
     });
   }
+
+  const langToggle = document.getElementById("lang-toggle");
+  if (langToggle) {
+    langToggle.value = localStorage.getItem("nexus_lang") || "en";
+    langToggle.addEventListener("change", (e) => {
+      localStorage.setItem("nexus_lang", e.target.value);
+      window.location.reload();
+    });
+  }
+  translatePage();
 
   const isPortalPage = document.getElementById("login-card") !== null;
   
@@ -226,7 +252,7 @@ async function initDashboardPage() {
         await loadTeams();
       }
     } catch (err) {
-      alert("Error saving profile: " + err.message);
+      alert(t("error-saving-profile") + ": " + err.message);
     }
   });
 
@@ -240,7 +266,7 @@ async function initDashboardPage() {
 
 function renderUserInfo() {
   document.getElementById("header-user-email").textContent = state.user.email;
-  document.getElementById("header-user-role").textContent = state.user.role;
+  document.getElementById("header-user-role").textContent = t("role-" + state.user.role.toLowerCase());
   document.getElementById("prof-first-name").textContent = state.user.first_name;
   document.getElementById("prof-last-name").textContent = state.user.last_name;
   
@@ -296,16 +322,16 @@ async function loadTeams() {
         .filter(p => p.team_id === myTeam.id)
         .map(p => {
           const u = users.find(user => user.id === p.user_id);
-          return u ? `${u.first_name} ${u.lastName || u.last_name} (${p.skills || 'No skills'})` : "Unknown student";
+          return u ? `${u.first_name} ${u.lastName || u.last_name} (${p.skills || t("none-val")})` : t("unknown-student");
         });
 
       infoEl.innerHTML = `
         <h4>${myTeam.name}</h4>
-        <p>Desired: ${myTeam.desired_skills || 'None'}</p>
+        <p>${t("desired")}: ${myTeam.desired_skills || t("none-val")}</p>
         <ul class="team-members-list">
           ${teamMembers.map(m => `<li>• ${m}</li>`).join("")}
         </ul>
-        <button id="leave-team-btn" class="btn btn-sm btn-danger" style="margin-top: 1rem; width: 100%">Leave Team</button>
+        <button id="leave-team-btn" class="btn btn-sm btn-danger" style="margin-top: 1rem; width: 100%">${t("leave-team")}</button>
       `;
 
       document.getElementById("leave-team-btn").addEventListener("click", async () => {
@@ -321,7 +347,7 @@ async function loadTeams() {
       if (state.user.role === "STUDENT") {
         createEl.classList.remove("hidden");
         matchEl.classList.remove("hidden");
-        infoEl.innerHTML = `<p>You are not currently in a team.</p>`;
+        infoEl.innerHTML = `<p>${t("not-in-team")}</p>`;
         
         try {
           const matchResults = await apiRequest("/api/teams/match");
@@ -329,7 +355,7 @@ async function loadTeams() {
           matchElList.innerHTML = "";
           
           if (matchResults.length === 0) {
-            matchElList.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted)">No teams available.</p>`;
+            matchElList.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted)">${t("no-teams-available")}</p>`;
           } else {
             matchResults.forEach(match => {
               const card = document.createElement("div");
@@ -337,10 +363,10 @@ async function loadTeams() {
               card.innerHTML = `
                 <div class="matching-card-header">
                   <h5>${match.name}</h5>
-                  <span class="match-score-badge">Match: ${match.match_score}</span>
+                  <span class="match-score-badge">${t("match")}: ${match.match_score}</span>
                 </div>
-                <p>Desired: ${match.desired_skills || 'None'}</p>
-                <button class="btn btn-sm btn-primary join-team-btn" data-id="${match.id}" style="margin-top:0.4rem">Join</button>
+                <p>${t("desired")}: ${match.desired_skills || t("none-val")}</p>
+                <button class="btn btn-sm btn-primary join-team-btn" data-id="${match.id}" style="margin-top:0.4rem">${t("join")}</button>
               `;
               matchElList.appendChild(card);
             });
@@ -359,13 +385,13 @@ async function loadTeams() {
             });
           }
         } catch (e) {
-          document.getElementById("recommended-teams-list").innerHTML = `<p>Failed to load recommendations.</p>`;
+          document.getElementById("recommended-teams-list").innerHTML = `<p>${t("failed-recommendations")}</p>`;
         }
       } else {
         createEl.classList.remove("hidden");
         matchEl.classList.add("hidden");
         infoEl.innerHTML = `
-          <h4>Global Teams List</h4>
+          <h4>${t("global-teams-list")}</h4>
           <ul class="team-members-list" style="max-height: 200px; overflow-y: auto;">
             ${teams.map(t => `<li>• ${t.name} (ID: ${t.id})</li>`).join("")}
           </ul>
@@ -373,7 +399,7 @@ async function loadTeams() {
       }
     }
   } catch (err) {
-    infoEl.innerHTML = `<p>Error loading teams: ${err.message}</p>`;
+    infoEl.innerHTML = `<p>${t("error-loading-teams")}: ${err.message}</p>`;
   }
 }
 
@@ -385,7 +411,7 @@ async function loadProjects() {
     const teams = await apiRequest("/api/teams");
     
     if (projects.length === 0) {
-      container.innerHTML = `<p>No projects registered yet.</p>`;
+      container.innerHTML = `<p>${t("no-projects")}</p>`;
       return;
     }
 
@@ -402,22 +428,22 @@ async function loadProjects() {
       card.innerHTML = `
         <div class="project-card-header">
           <h4>${proj.title}</h4>
-          <span class="badge">${proj.status}</span>
+          <span class="badge">${t("status-" + proj.status.toLowerCase())}</span>
         </div>
-        <p>${proj.description || 'No description provided.'}</p>
+        <p>${proj.description || t("no-description")}</p>
         <div class="project-meta">
           <div class="project-meta-item">
-            <span>Assigned Team:</span>
-            <span>${team ? team.name : 'Unassigned'}</span>
+            <span>${t("assigned-team-meta")}:</span>
+            <span>${team ? team.name : t("unassigned-val")}</span>
           </div>
           <div class="project-meta-item ${isOverdue ? 'overdue' : ''}">
-            <span>Deadline:</span>
-            <span>${proj.deadline ? new Date(proj.deadline).toLocaleDateString() : 'None'}</span>
+            <span>${t("deadline-meta")}:</span>
+            <span>${proj.deadline ? new Date(proj.deadline).toLocaleDateString() : t("none-val")}</span>
           </div>
           ${(state.user.role === 'COORDINATOR' || state.user.role === 'TEACHER') ? `
             <div style="display:flex; gap:0.5rem; margin-top:0.5rem">
-              <button class="btn btn-sm btn-secondary edit-proj-btn" data-id="${proj.id}">Edit</button>
-              <button class="btn btn-sm btn-danger delete-proj-btn" data-id="${proj.id}">Delete</button>
+              <button class="btn btn-sm btn-secondary edit-proj-btn" data-id="${proj.id}">${t("edit-btn")}</button>
+              <button class="btn btn-sm btn-danger delete-proj-btn" data-id="${proj.id}">${t("delete-btn")}</button>
             </div>
           ` : ""}
         </div>
@@ -435,7 +461,7 @@ async function loadProjects() {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = e.target.getAttribute("data-id");
-        if (confirm("Delete this project?")) {
+        if (confirm(t("confirm-delete-project"))) {
           try {
             await apiRequest(`/api/projects/${id}`, { method: "DELETE" });
             if (state.activeProject && state.activeProject.id == id) {
@@ -463,7 +489,7 @@ async function loadProjects() {
     });
 
   } catch (err) {
-    container.innerHTML = `<p>Error loading projects: ${err.message}</p>`;
+    container.innerHTML = `<p>${t("error-loading-projects")}: ${err.message}</p>`;
   }
 }
 
@@ -486,7 +512,7 @@ async function loadSprints() {
   try {
     const sprints = await apiRequest(`/api/projects/${state.activeProject.id}/sprints`);
     if (sprints.length === 0) {
-      tabsList.innerHTML = `<p style="font-size:0.9rem; color:var(--text-muted)">No sprints defined for this project.</p>`;
+      tabsList.innerHTML = `<p style="font-size:0.9rem; color:var(--text-muted)">${t("no-sprints")}</p>`;
       return;
     }
 
@@ -510,7 +536,7 @@ async function loadSprints() {
         delBtn.style.fontWeight = "bold";
         delBtn.addEventListener("click", async (e) => {
           e.stopPropagation();
-          if (confirm("Delete sprint?")) {
+          if (confirm(t("confirm-delete-sprint"))) {
             try {
               await apiRequest(`/api/projects/${state.activeProject.id}/sprints/${sprint.id}`, { method: "DELETE" });
               if (state.activeSprint && state.activeSprint.id === sprint.id) {
@@ -566,16 +592,16 @@ async function loadTasks() {
         <h6>${task.title}</h6>
         <p>${task.description || ''}</p>
         <div class="task-card-footer">
-          <span style="color:var(--text-muted)">Team: ${assigned ? assigned.name : 'None'}</span>
+          <span style="color:var(--text-muted)">${t("team-meta")}: ${assigned ? assigned.name : t("none-val")}</span>
           <select class="select-field btn-sm task-status-select" data-id="${task.id}" style="padding:0.15rem 0.3rem; font-size:0.75rem">
-            <option value="TO_DO" ${task.status === 'TO_DO' ? 'selected' : ''}>To Do</option>
-            <option value="IN_PROGRESS" ${task.status === 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
-            <option value="REVIEW" ${task.status === 'REVIEW' ? 'selected' : ''}>Review</option>
-            <option value="DONE" ${task.status === 'DONE' ? 'selected' : ''}>Done</option>
+            <option value="TO_DO" ${task.status === 'TO_DO' ? 'selected' : ''}>${t("status-to_do")}</option>
+            <option value="IN_PROGRESS" ${task.status === 'IN_PROGRESS' ? 'selected' : ''}>${t("status-in_progress")}</option>
+            <option value="REVIEW" ${task.status === 'REVIEW' ? 'selected' : ''}>${t("status-review")}</option>
+            <option value="DONE" ${task.status === 'DONE' ? 'selected' : ''}>${t("status-done")}</option>
           </select>
         </div>
         ${(state.user.role === 'COORDINATOR' || state.user.role === 'TEACHER') ? `
-          <button class="btn btn-sm btn-danger delete-task-btn" data-id="${task.id}" style="margin-top:0.4rem; padding:0.15rem; font-size:0.75rem; width:100%">Delete</button>
+          <button class="btn btn-sm btn-danger delete-task-btn" data-id="${task.id}" style="margin-top:0.4rem; padding:0.15rem; font-size:0.75rem; width:100%">${t("delete-btn")}</button>
         ` : ''}
       `;
 
@@ -604,7 +630,7 @@ async function loadTasks() {
       if (delBtn) {
         delBtn.addEventListener("click", async (e) => {
           const id = e.target.getAttribute("data-id");
-          if (confirm("Delete this task?")) {
+          if (confirm(t("confirm-delete-task"))) {
             try {
               await apiRequest(`/api/tasks/${id}`, { method: "DELETE" });
               loadTasks();
@@ -639,7 +665,7 @@ function setupModals() {
   if (addProjBtn) {
     addProjBtn.addEventListener("click", () => {
       editingProject = null;
-      document.getElementById("project-modal-title").textContent = "New Project";
+      document.getElementById("project-modal-title").textContent = t("new-project");
       document.getElementById("project-form").reset();
       loadProjectTeamOptions();
       pModal.classList.remove("hidden");
@@ -667,7 +693,7 @@ function setupModals() {
 
   window.showProjectModal = (proj) => {
     editingProject = proj;
-    document.getElementById("project-modal-title").textContent = "Edit Project";
+    document.getElementById("project-modal-title").textContent = t("edit-project");
     document.getElementById("proj-title").value = proj.title;
     document.getElementById("proj-desc").value = proj.description || "";
     document.getElementById("proj-github").value = proj.github_url || "";
@@ -683,7 +709,7 @@ function setupModals() {
 
   async function loadProjectTeamOptions(selectedTeamId = null) {
     const select = document.getElementById("proj-team");
-    select.innerHTML = `<option value="">Unassigned</option>`;
+    select.innerHTML = `<option value="">${t("unassigned-val")}</option>`;
     try {
       const teams = await apiRequest("/api/teams");
       teams.forEach(t => {
@@ -698,7 +724,7 @@ function setupModals() {
 
   async function loadTaskTeamOptions() {
     const select = document.getElementById("task-team");
-    select.innerHTML = `<option value="">Unassigned</option>`;
+    select.innerHTML = `<option value="">${t("unassigned-val")}</option>`;
     try {
       const teams = await apiRequest("/api/teams");
       teams.forEach(t => {
@@ -743,7 +769,7 @@ function setupModals() {
       pModal.classList.add("hidden");
       await loadProjects();
     } catch (err) {
-      alert("Validation Error: " + err.message);
+      alert(t("validation-error") + ": " + err.message);
     }
   });
 
@@ -769,7 +795,7 @@ function setupModals() {
       sModal.classList.add("hidden");
       loadSprints();
     } catch (err) {
-      alert("Validation Error: " + err.message);
+      alert(t("validation-error") + ": " + err.message);
     }
   });
 
@@ -797,7 +823,7 @@ function setupModals() {
       tModal.classList.add("hidden");
       loadTasks();
     } catch (err) {
-      alert("Validation Error: " + err.message);
+      alert(t("validation-error") + ": " + err.message);
     }
   });
 

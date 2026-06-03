@@ -90,13 +90,13 @@ body {
   font-weight: 400;
 }
 
-.backend-select-wrapper {
+.backend-select-wrapper, .lang-select-wrapper {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.backend-select-wrapper label {
+.backend-select-wrapper label, .lang-select-wrapper label {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
