@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus CRM - Portal Access</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-decor">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+
+  <div class="portal-container">
+    <header class="portal-header">
+      <div class="logo">NEXUS <span>CRM</span></div>
+      <div class="backend-select-wrapper">
+        <label for="backend-toggle">Backend:</label>
+        <select id="backend-toggle" class="select-field">
+          <option value="http://localhost:8000">FastAPI (8000)</option>
+          <option value="http://localhost:3000">Express (3000)</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <div class="glass-card auth-card" id="login-card">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Enter your credentials to access the tracking portal</p>
+        <div id="login-error" class="error-msg hidden"></div>
+        <form id="login-form">
+          <div class="input-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" required placeholder="name@domain.com">
+          </div>
+          <div class="input-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+        <div class="auth-switch">
+          Don't have an account? <span id="to-register-btn">Create one</span>
+        </div>
+      </div>
+
+      <div class="glass-card auth-card hidden" id="register-card">
+        <h2>Create Account</h2>
+        <p class="subtitle">Join the Nexus student tracker network</p>
+        <div id="register-error" class="error-msg hidden"></div>
+        <form id="register-form">
+          <div class="input-row">
+            <div class="input-group">
+              <label for="reg-first-name">First Name</label>
+              <input type="text" id="reg-first-name" required placeholder="John">
+            </div>
+            <div class="input-group">
+              <label for="reg-last-name">Last Name</label>
+              <input type="text" id="reg-last-name" required placeholder="Doe">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" required placeholder="name@domain.com">
+          </div>
+          <div class="input-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" required placeholder="••••••••">
+          </div>
+          <div class="input-group">
+            <label for="reg-role">Portal Role</label>
+            <select id="reg-role" class="select-field">
+              <option value="STUDENT">Student</option>
+              <option value="TEACHER">Teacher</option>
+              <option value="COORDINATOR">Coordinator</option>
+            </select>
+          </div>
+          <div class="input-group" id="student-id-wrapper">
+            <label for="reg-student-id">Student ID / JSN (12 Digits)</label>
+            <input type="text" id="reg-student-id" placeholder="123456789012" maxlength="12">
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+        <div class="auth-switch">
+          Already registered? <span id="to-login-btn">Sign in</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

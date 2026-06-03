@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus CRM - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-decor">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+
+  <div class="dashboard-wrapper">
+    <header class="dashboard-header">
+      <div class="logo">NEXUS <span>CRM</span></div>
+      
+      <div class="header-controls">
+        <div class="backend-select-wrapper">
+          <label for="backend-toggle">Backend:</label>
+          <select id="backend-toggle" class="select-field">
+            <option value="http://localhost:8000">FastAPI (8000)</option>
+            <option value="http://localhost:3000">Express (3000)</option>
+          </select>
+        </div>
+
+        <div class="user-pill">
+          <span id="header-user-email">Loading...</span>
+          <span class="badge" id="header-user-role">Role</span>
+          <button id="logout-btn" class="btn btn-sm btn-danger">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-grid">
+      <aside class="sidebar-panel">
+        <div class="glass-card panel-card">
+          <h3>My Profile</h3>
+          <div id="profile-success" class="success-msg hidden">Profile updated</div>
+          <form id="profile-form">
+            <div class="input-group">
+              <label>First Name</label>
+              <div class="static-val" id="prof-first-name">-</div>
+            </div>
+            <div class="input-group">
+              <label>Last Name</label>
+              <div class="static-val" id="prof-last-name">-</div>
+            </div>
+            <div class="input-group" id="prof-student-id-group">
+              <label>Student ID / JSN</label>
+              <div class="static-val" id="prof-student-id">-</div>
+            </div>
+            <div class="input-group">
+              <label for="prof-skills">Skills (Comma-separated)</label>
+              <input type="text" id="prof-skills" placeholder="Python, SQL, JS">
+            </div>
+            <div class="input-group">
+              <label for="prof-bio">Short Bio</label>
+              <textarea id="prof-bio" rows="2" placeholder="Tell us about yourself"></textarea>
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary">Save Profile</button>
+          </form>
+        </div>
+
+        <div class="glass-card panel-card" id="team-section">
+          <h3>Team Management</h3>
+          <div id="current-team-info" class="team-info-box">
+            Loading team info...
+          </div>
+          
+          <div class="create-team-box hidden" id="create-team-container">
+            <h4>Create Team</h4>
+            <form id="create-team-form">
+              <input type="text" id="new-team-name" placeholder="Team Name" required class="input-field-sm">
+              <input type="text" id="new-team-skills" placeholder="Desired Skills (e.g. JS, Python)" class="input-field-sm">
+              <button type="submit" class="btn btn-sm btn-primary">Create</button>
+            </form>
+          </div>
+
+          <div class="team-matching-box hidden" id="team-matching-container">
+            <h4>Recommended Teams</h4>
+            <div id="recommended-teams-list" class="recommended-list">
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content-panel">
+        <div class="glass-card panel-card">
+          <div class="panel-header-action">
+            <h3>Project Boards</h3>
+            <button id="show-add-project-btn" class="btn btn-sm btn-primary hidden">Add Project</button>
+          </div>
+
+          <div class="modal-overlay hidden" id="project-modal">
+            <div class="glass-card modal-card">
+              <h4 id="project-modal-title">New Project</h4>
+              <form id="project-form">
+                <div class="input-group">
+                  <label for="proj-title">Title</label>
+                  <input type="text" id="proj-title" required placeholder="Hogwarts CRM">
+                </div>
+                <div class="input-group">
+                  <label for="proj-desc">Description</label>
+                  <textarea id="proj-desc" rows="3" placeholder="Project details"></textarea>
+                </div>
+                <div class="input-group">
+                  <label for="proj-github">GitHub Repository URL</label>
+                  <input type="text" id="proj-github" placeholder="https://github.com/org/repo">
+                </div>
+                <div class="input-group">
+                  <label for="proj-deadline">Deadline</label>
+                  <input type="datetime-local" id="proj-deadline">
+                </div>
+                <div class="input-group">
+                  <label for="proj-status">Status</label>
+                  <select id="proj-status" class="select-field">
+                    <option value="PLANNED">Planned</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label for="proj-team">Assigned Team</label>
+                  <select id="proj-team" class="select-field">
+                    <option value="">Unassigned</option>
+                  </select>
+                </div>
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button type="button" id="close-project-modal-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div id="projects-list-container" class="projects-grid">
+          </div>
+        </div>
+
+        <div class="glass-card panel-card hidden" id="sprint-section">
+          <div class="panel-header-action">
+            <h3>Sprints for: <span id="active-project-title">-</span></h3>
+            <button id="show-add-sprint-btn" class="btn btn-sm btn-primary hidden">Add Sprint</button>
+          </div>
+
+          <div class="modal-overlay hidden" id="sprint-modal">
+            <div class="glass-card modal-card">
+              <h4>New Sprint</h4>
+              <form id="sprint-form">
+                <div class="input-group">
+                  <label for="sprint-name">Sprint Name</label>
+                  <input type="text" id="sprint-name" required placeholder="Sprint 1 - Authentication">
+                </div>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="sprint-start">Start Date</label>
+                    <input type="datetime-local" id="sprint-start" required>
+                  </div>
+                  <div class="input-group">
+                    <label for="sprint-end">End Date</label>
+                    <input type="datetime-local" id="sprint-end" required>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label for="sprint-status">Status</label>
+                  <select id="sprint-status" class="select-field">
+                    <option value="PLANNED">Planned</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button type="button" id="close-sprint-modal-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="sprint-tabs-wrapper" id="sprints-tabs-list">
+          </div>
+
+          <div class="tasks-board-wrapper hidden" id="tasks-board-container">
+            <div class="tasks-board-header">
+              <h4>Tasks List</h4>
+              <button id="show-add-task-btn" class="btn btn-sm btn-primary">Add Task</button>
+            </div>
+
+            <div class="modal-overlay hidden" id="task-modal">
+              <div class="glass-card modal-card">
+                <h4 id="task-modal-title">New Task</h4>
+                <form id="task-form">
+                  <div class="input-group">
+                    <label for="task-title">Title</label>
+                    <input type="text" id="task-title" required placeholder="API validation">
+                  </div>
+                  <div class="input-group">
+                    <label for="task-desc">Description</label>
+                    <textarea id="task-desc" rows="2" placeholder="Task details"></textarea>
+                  </div>
+                  <div class="input-group">
+                    <label for="task-status">Status</label>
+                    <select id="task-status" class="select-field">
+                      <option value="TO_DO">To Do</option>
+                      <option value="IN_PROGRESS">In Progress</option>
+                      <option value="REVIEW">Review</option>
+                      <option value="DONE">Done</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label for="task-team">Assigned Team</label>
+                    <select id="task-team" class="select-field">
+                      <option value="">Unassigned</option>
+                    </select>
+                  </div>
+                  <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" id="close-task-modal-btn" class="btn btn-secondary">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="tasks-kanban-board">
+              <div class="kanban-column" data-status="TO_DO">
+                <h5>To Do</h5>
+                <div class="tasks-list" id="tasks-todo-list"></div>
+              </div>
+              <div class="kanban-column" data-status="IN_PROGRESS">
+                <h5>In Progress</h5>
+                <div class="tasks-list" id="tasks-inprogress-list"></div>
+              </div>
+              <div class="kanban-column" data-status="REVIEW">
+                <h5>Review</h5>
+                <div class="tasks-list" id="tasks-review-list"></div>
+              </div>
+              <div class="kanban-column" data-status="DONE">
+                <h5>Done</h5>
+                <div class="tasks-list" id="tasks-done-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
