@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.database import engine, Base
 from app.routers import auth, users, profiles, teams, projects, tasks
 
@@ -22,6 +24,5 @@ app.include_router(teams.router)
 app.include_router(projects.router)
 app.include_router(tasks.router)
 
-@app.get("/")
-def read_root():
-    return {"status": "running"}
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "frontend")
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")

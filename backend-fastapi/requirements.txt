@@ -5,4 +5,6 @@ pydantic
 passlib[bcrypt]
 pyjwt
 python-dotenv
-bcrypt
+bcrypt==4.0.1
+email-validator
+python-multipart
