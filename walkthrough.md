@@ -1,12 +1,12 @@
-# Nexus CRM — Project Walkthrough
+# Nexus CRM — Обзор проекта (Walkthrough)
 
-## What Was Built
+## Что было создано
 
-A complete HR/CRM student project tracker with two independently runnable backends, a shared database schema, and a single vanilla frontend that can target either backend via a live toggle.
+Полный HR/CRM трекер студенческих проектов с двумя независимо запускаемыми бэкендами, общей схемой базы данных и единым фронтендом на чистом JavaScript/HTML/CSS, который может работать с любым из бэкендов благодаря динамическому переключателю.
 
 ---
 
-## File Structure
+## Структура файлов
 
 ```
 Nexus-main/
@@ -73,42 +73,42 @@ Nexus-main/
 
 ---
 
-## Key Design Decisions
+## Ключевые архитектурные решения
 
-### Validation (both backends match exactly)
-| Field | Rule |
+### Валидация (полностью идентична на обоих бэкендах)
+| Поле | Правило |
 |---|---|
-| `student_id` | Exactly 12 numeric digits; required only when role = STUDENT |
-| `github_url` | Must start with `https://github.com/` |
-| `deadline` | Must be a date strictly in the future |
+| `student_id` | Ровно 12 цифр; требуется только когда роль = STUDENT |
+| `github_url` | Должен начинаться с `https://github.com/` |
+| `deadline` | Должен быть строго в будущем |
 
-### RBAC Roles
-| Role | Permissions |
+### Роли доступа (RBAC)
+| Роль | Права доступа |
 |---|---|
-| `STUDENT` | Edit own profile, join/leave/create teams, view all, update task status |
-| `TEACHER` | All student rights + create/edit/delete projects, sprints, teams |
-| `COORDINATOR` | Full access including user role management |
+| `STUDENT` | Редактировать свой профиль, создавать/выходить/вступать в команды, просматривать всё, обновлять статус задач |
+| `TEACHER` | Все права студента + создание/редактирование/удаление проектов, спринтов, команд |
+| `COORDINATOR` | Полный доступ, включая управление ролями пользователей |
 
-### Team Matching Algorithm
-Both backends implement an identical score-based matching algorithm on `GET /api/teams/match`:
-1. Load the requesting student's skill list (comma-separated string → array).
-2. Load all teams with `looking_for_members = true`.
-3. For each team, count intersecting skills between student and `desired_skills`.
-4. Sort by score descending and return with `match_score` and `matched_skills` fields.
+### Алгоритм подбора команд (Team Matching)
+Оба бэкенда реализуют идентичный алгоритм подбора команд на основе баллов при запросе `GET /api/teams/match`:
+1. Загружается список навыков текущего студента (строка через запятую → массив).
+2. Загружаются все команды с флагом `looking_for_members = true`.
+3. Для каждой команды подсчитывается количество совпадающих навыков между студентом и `desired_skills` команды.
+4. Результаты сортируются по убыванию баллов и возвращаются с полями `match_score` и `matched_skills`.
 
-### Backend Toggle
-The frontend persists the chosen backend URL in `localStorage`. On every `apiRequest()` call the URL is prepended dynamically. The login form also adapts the request body format: `application/x-www-form-urlencoded` for FastAPI's OAuth2PasswordRequestForm, and `application/json` for Express.
+### Переключатель бэкенда
+Фронтенд сохраняет выбранный URL бэкенда в `localStorage`. При каждом вызове `apiRequest()` этот URL динамически подставляется в начало адреса. Форма входа также адаптирует формат тела запроса: `application/x-www-form-urlencoded` для OAuth2PasswordRequestForm в FastAPI и `application/json` для Express.
 
-### Docker Containers
-Both Dockerfiles bake `ENV` defaults that are overridable by `docker-compose.yml` environment keys at runtime. The startup sequence is:
+### Контейнеризация (Docker)
+Оба Dockerfile содержат настройки `ENV` по умолчанию, которые могут быть переопределены через `docker-compose.yml` во время запуска. Последовательность запуска:
 - **FastAPI**: `python seed.py` → `uvicorn`
 - **Express**: `npx prisma db push` → `node prisma/seed.js` → `node src/index.js`
 
 ---
 
-## Running Locally
+## Запуск на локальном компьютере
 
-### FastAPI (port 8000)
+### FastAPI (порт 8000)
 ```bash
 cd backend-fastapi
 py -m venv .venv
@@ -118,9 +118,9 @@ py seed.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+Документация Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### Express (port 3000)
+### Express (порт 3000)
 ```bash
 cd backend-express
 npm install
@@ -129,19 +129,19 @@ node prisma/seed.js
 npm run dev
 ```
 
-### Frontend
-Open `frontend/index.html` in a browser. Use the **Backend** dropdown at the top right to switch between FastAPI and Express. The selection is saved across page refreshes.
+### Фронтенд
+Откройте файл `frontend/index.html` в браузере. Используйте выпадающий список **Backend** в верхнем правом углу для переключения между FastAPI и Express. Выбор сохраняется при перезагрузке страницы.
 
-### Docker Compose (all services)
+### Docker Compose (все сервисы)
 ```bash
 docker-compose up --build
 ```
 
 ---
 
-## Seed Accounts (both backends)
+## Тестовые учетные записи (для обоих бэкендов)
 
-| Email | Password | Role |
+| Email | Пароль | Роль |
 |---|---|---|
 | coordinator@example.com | password | COORDINATOR |
 | teacher@example.com | password | TEACHER |
@@ -151,24 +151,24 @@ docker-compose up --build
 
 ---
 
-## Validation Test Cases
+## Тест-кейсы для валидации
 
 ```
 POST /api/auth/register
-  student_id: "12345"           → 400 Bad Request (not 12 digits)
-  student_id: "abcdefghijkl"    → 400 Bad Request (not numeric)
+  student_id: "12345"           → 400 Bad Request (не 12 цифр)
+  student_id: "abcdefghijkl"    → 400 Bad Request (содержит буквы)
 
 POST /api/projects
-  github_url: "github.com/x"   → 400 Bad Request (no https://github.com/ prefix)
-  deadline: "2020-01-01"        → 400 Bad Request (date is in the past)
+  github_url: "github.com/x"   → 400 Bad Request (нет префикса https://github.com/)
+  deadline: "2020-01-01"        → 400 Bad Request (дата в прошлом)
 
-GET /api/teams/match            → 403 if not STUDENT role
-DELETE /api/teams/:id           → 403 if not COORDINATOR or TEACHER
+GET /api/teams/match            → 403 Forbidden если роль не STUDENT
+DELETE /api/teams/:id           → 403 Forbidden если роль не COORDINATOR или TEACHER
 ```
 
 ---
 
-## Code Constraints Applied
-- Zero comments, docstrings, or explanatory notes in any codebase file.
-- `py` command used exclusively in all README and terminal instruction references.
-- `python` used only inside Docker container `CMD` (Linux containers have no `py` alias).
+## Ограничения кода (примененные правила)
+- Полное отсутствие комментариев, строк документации (docstrings) или пояснительных записок в файлах кодовой базы.
+- Использование исключительно команды `py` для запуска скриптов в README и инструкциях терминала.
+- Использование команды `python` только в Docker-контейнерах (так как в образах Linux нет псевдонима `py`).
