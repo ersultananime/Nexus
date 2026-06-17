@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend-fastapi
+      dockerfile: Dockerfile
+    container_name: nexus-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///nexus.db
+      - JWT_SECRET=${JWT_SECRET:-supersecretjwtkeyforfastapiapplicaton12345!}
+      - JWT_ALGORITHM=HS256
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nexus-frontend
+    ports:
+      - "80:80"
+    environment:
+      - BACKEND_HOST=backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
