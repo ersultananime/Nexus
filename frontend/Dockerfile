@@ -1,0 +1,10 @@
+FROM nginx:alpine
+
+ENV BACKEND_HOST=backend:8000
+
+COPY . /usr/share/nginx/html
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
