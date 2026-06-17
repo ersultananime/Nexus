@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: nexus-backend
+    runtime: docker
+    repo: https://github.com/your-username/your-repo
+    rootDir: backend-fastapi
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///nexus.db
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /docs
+
+  - type: web
+    name: nexus-frontend
+    runtime: docker
+    repo: https://github.com/your-username/your-repo
+    rootDir: frontend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: BACKEND_HOST
+        fromService:
+          type: web
+          name: nexus-backend
+          property: hostport
