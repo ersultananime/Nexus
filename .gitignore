@@ -19,8 +19,6 @@ dist/
 build/
 *.egg-info/
 .prisma/
-/backend-express/prisma/dev.db
-/backend-express/prisma/dev.db-journal
 /backend-fastapi/nexus.db
 .vscode/
 .idea/

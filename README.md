@@ -5,13 +5,11 @@
 ## Структура проекта
 
 - `backend-fastapi/` — реализация бэкенда на FastAPI, SQLAlchemy и SQLite.
-- `backend-express/` — реализация бэкенда на Node.js (Express), Prisma ORM и SQLite.
 - `frontend/` — статическое приложение на HTML, CSS (Vanilla CSS) и JavaScript (Vanilla JS).
 
 ## Требования
 
 - Python 3.10+
-- Node.js 18+
 - Docker и Docker Compose
 
 ## Быстрый старт
@@ -44,36 +42,9 @@
    uvicorn app.main:app --reload --port 8000
    ```
 
-### Запуск бэкенда Express
-
-1. Перейдите в каталог:
-   ```bash
-   cd backend-express
-   ```
-
-2. Установите зависимости:
-   ```bash
-   npm install
-   ```
-
-3. Инициализируйте схемы базы данных:
-   ```bash
-   npx prisma db push
-   ```
-
-4. Заполните базу данных:
-   ```bash
-   node prisma/seed.js
-   ```
-
-5. Запустите сервер разработки:
-   ```bash
-   npm run dev
-   ```
-
 ### Запуск фронтенда
 
-Откройте файл `frontend/index.html` непосредственно в вашем веб-браузере. Вы можете настроить URL-адрес бэкенда в настройках панели мониторинга, чтобы указать на бэкенд FastAPI (порт 8000) или бэкенд Express (порт 3000).
+Откройте файл `frontend/index.html` непосредственно в вашем веб-браузере. Вы можете настроить URL-адрес бэкенда в настройках панели мониторинга, чтобы указать на бэкенд FastAPI (порт 8000).
 
 ### Запуск с помощью Docker Compose
 
@@ -83,5 +54,4 @@ docker-compose up --build
 ```
 Это запустит:
 - Бэкенд FastAPI на порту 8000
-- Бэкенд Express на порту 3000
 - Фронтенд на порту 80
