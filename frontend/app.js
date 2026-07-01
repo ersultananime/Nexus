@@ -135,21 +135,15 @@ function initAuthPage() {
     errorEl.classList.add("hidden");
 
     try {
-      let body;
-      let headers = {};
-      
-      if (state.backendUrl.includes("8000")) {
-        body = new URLSearchParams();
-        body.append("username", email);
-        body.append("password", password);
-        headers["Content-Type"] = "application/x-www-form-urlencoded";
-      } else {
-        body = { username: email, password: password };
-      }
+      const body = new URLSearchParams();
+      body.append("username", email);
+      body.append("password", password);
 
       const res = await apiRequest("/api/auth/login", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
         body
       });
 
@@ -187,20 +181,15 @@ function initAuthPage() {
         }
       });
 
-      let body;
-      let headers = {};
-      if (state.backendUrl.includes("8000")) {
-        body = new URLSearchParams();
-        body.append("username", email);
-        body.append("password", password);
-        headers["Content-Type"] = "application/x-www-form-urlencoded";
-      } else {
-        body = { username: email, password: password };
-      }
+      const body = new URLSearchParams();
+      body.append("username", email);
+      body.append("password", password);
 
       const loginRes = await apiRequest("/api/auth/login", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
         body
       });
 
