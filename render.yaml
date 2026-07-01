@@ -8,8 +8,7 @@ services:
     plan: free
     envVars:
       - key: DATABASE_URL
-        value: postgresql://nexus_db_6ip6_user:postgresql://nexus_db_6ip6_user:0oOluseqKF0q6ubfIiyV5dUW1Zv2yx7b@dpg-d929g95ckfvc73ddus60-a/nexus_db_6ip6
-        @dpg-d929g95ckfvc73ddus60-a.oregon-postgres.render.com/nexus_db_6ip6
+        value: "postgresql://nexus_db_6ip6_user:0o0luseqKF0q6ubfIiyV5dUW1Zv2yx7b@dpg-d929g95ckfvc73ddus60-a.oregon-postgres.render.com/nexus_db_6ip6"
       - key: JWT_ALGORITHM
         value: HS256
       - key: JWT_SECRET
