@@ -2,23 +2,24 @@ services:
   - type: web
     name: nexus-backend
     runtime: docker
-    repo: https://github.com/your-username/your-repo
+    repo: https://github.com/ersultananime/Nexus
     rootDir: backend-fastapi
     dockerfilePath: ./Dockerfile
     plan: free
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///nexus.db
+        value: postgresql://nexus_db_6ip6_user:postgresql://nexus_db_6ip6_user:0oOluseqKF0q6ubfIiyV5dUW1Zv2yx7b@dpg-d929g95ckfvc73ddus60-a/nexus_db_6ip6
+        @dpg-d929g95ckfvc73ddus60-a.oregon-postgres.render.com/nexus_db_6ip6
       - key: JWT_ALGORITHM
         value: HS256
       - key: JWT_SECRET
-        generateValue: true
+        value: supersecretjwtkeyforfastapiapplicaton12345!
     healthCheckPath: /docs
 
   - type: web
     name: nexus-frontend
     runtime: docker
-    repo: https://github.com/your-username/your-repo
+    repo: https://github.com/ersultananime/Nexus
     rootDir: frontend
     dockerfilePath: ./Dockerfile
     plan: free
