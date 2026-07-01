@@ -48,7 +48,11 @@ async function apiRequest(path, options = {}) {
     let errorDetail = "API Error";
     try {
       const data = await response.json();
-      errorDetail = data.detail || (data.errors ? data.errors.map(e => e.message).join(", ") : null) || JSON.stringify(data);
+      if (Array.isArray(data.detail)) {
+        errorDetail = data.detail.map(e => e.msg || JSON.stringify(e)).join("; ");
+      } else {
+        errorDetail = data.detail || (data.errors ? data.errors.map(e => e.message).join(", ") : null) || JSON.stringify(data);
+      }
     } catch (e) {}
     throw new Error(errorDetail);
   }
