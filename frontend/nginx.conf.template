@@ -6,7 +6,7 @@ server {
     index index.html;
 
     location /api/ {
-        # Жестко прописываем URL бэкенда, чтобы исключить ошибки переменных
+        # Жесткий адрес вашего бэкенда на Render
         proxy_pass https://nexus-backend-fuet.onrender.com;
         
         proxy_set_header Host nexus-backend-fuet.onrender.com;
