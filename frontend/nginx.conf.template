@@ -5,17 +5,17 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # Явное проксирование запросов к бэкенду
+    # Жесткое перенаправление запросов к API на ваш работающий бэкенд
     location /api/ {
-        # Используем ваш работающий адрес бэкенда
         proxy_pass https://nexus-backend-fuet.onrender.com;
-        
+
+        # Указываем заголовки для корректной работы прокси
         proxy_set_header Host nexus-backend-fuet.onrender.com;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Увеличение таймаутов для стабильности
+        # Таймауты для предотвращения преждевременного разрыва соединения
         proxy_connect_timeout 60s;
         proxy_read_timeout 60s;
     }
