@@ -1,68 +1,61 @@
-import os
-import datetime
-from typing import Optional, List
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-import jwt
-from passlib.context import CryptContext
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app import models
+from app import models, schemas, auth
 
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecretjwtkeyforfastapiapplicaton12345!")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
-def _truncate_password(password: str) -> str:
-    """Truncate password to 72 bytes to satisfy bcrypt's hard limit."""
-    encoded = password.encode("utf-8")
-    return encoded[:72].decode("utf-8", errors="ignore")
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(_truncate_password(plain_password), hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(_truncate_password(password))
-
-def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
-
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except jwt.PyJWTError:
-        raise credentials_exception
-    user = db.query(models.User).filter(models.User.email == email).first()
-    if user is None:
-        raise credentials_exception
-    return user
-
-class RoleChecker:
-    def __init__(self, allowed_roles: List[str]):
-        self.allowed_roles = allowed_roles
-
-    def __call__(self, current_user: models.User = Depends(get_current_user)):
-        if current_user.role not in self.allowed_roles:
+@router.post("/register", response_model=schemas.UserResponse)
+def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == user_in.email).first()
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    if user_in.role == "STUDENT":
+        if not user_in.student_id:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not enough permissions",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="student_id is required for student role"
             )
-        return current_user
+        db_student = db.query(models.User).filter(models.User.student_id == user_in.student_id).first()
+        if db_student:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="student_id already exists"
+            )
+    else:
+        user_in.student_id = None
+
+    hashed_password = auth.get_password_hash(user_in.password)
+    db_user = models.User(
+        email=user_in.email,
+        hashed_password=hashed_password,
+        first_name=user_in.first_name,
+        last_name=user_in.last_name,
+        role=user_in.role,
+        student_id=user_in.student_id
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    if db_user.role == "STUDENT":
+        db_profile = models.StudentProfile(user_id=db_user.id)
+        db.add(db_profile)
+        db.commit()
+
+    return db_user
+
+@router.post("/login", response_model=schemas.Token)
+def login(user_in: schemas.LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == user_in.email).first()
+    if not user or not auth.verify_password(user_in.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = auth.create_access_token(data={"sub": user.email, "role": user.role})
+    return {"access_token": access_token, "token_type": "bearer"}
