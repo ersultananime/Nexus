@@ -5,11 +5,11 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    
     location /api/ {
-        proxy_pass https://${BACKEND_HOST};
+        # Жестко прописываем URL бэкенда, чтобы исключить ошибки переменных
+        proxy_pass https://nexus-backend-fuet.onrender.com;
         
-        proxy_set_header Host ${BACKEND_HOST};
+        proxy_set_header Host nexus-backend-fuet.onrender.com;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
