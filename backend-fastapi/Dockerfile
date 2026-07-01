@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "py seed.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["sh", "-c", "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
