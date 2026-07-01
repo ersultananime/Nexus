@@ -5,8 +5,10 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # Жесткое перенаправление запросов к API на ваш работающий бэкенд
+    
     location /api/ {
+        proxy_pass https://${BACKEND_HOST};
+        proxy_set_header Host ${BACKEND_HOST};
         proxy_pass https://nexus-backend-fuet.onrender.com;
 
         # Указываем заголовки для корректной работы прокси
