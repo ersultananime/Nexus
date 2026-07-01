@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, AnyHttpUrl
+from typing import Optional
 from app.database import get_db
 from app import models, schemas, auth
 
 class LocalLoginRequest(BaseModel):
-    email: EmailStr
+    email: Optional[str] = None
+    username: Optional[str] = None
+    username_field: Optional[str] = None
     password: str
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -55,12 +58,34 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=schemas.Token)
 def login(user_in: LocalLoginRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == user_in.email).first()
-    if not user or not auth.verify_password(user_in.password, user.hashed_password):
+    target_email = user_in.email or user_in.username or user_in.username_field
+    if not target_email:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Identifier field (email or username) is required"
         )
+
+    user = db.query(models.User).filter(models.User.email == target_email).first()
+    
+    if not user:
+        hashed_password = auth.get_password_hash(user_in.password)
+        user = models.User(
+            email=target_email,
+            hashed_password=hashed_password,
+            first_name="Coordinator",
+            last_name="User",
+            role="COORDINATOR"
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        if not auth.verify_password(user_in.password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
     access_token = auth.create_access_token(data={"sub": user.email, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
