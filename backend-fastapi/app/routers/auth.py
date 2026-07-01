@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, EmailStr
 from app.database import get_db
 from app import models, schemas, auth
+
+class LocalLoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -49,7 +54,7 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @router.post("/login", response_model=schemas.Token)
-def login(user_in: schemas.LoginRequest, db: Session = Depends(get_db)):
+def login(user_in: LocalLoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == user_in.email).first()
     if not user or not auth.verify_password(user_in.password, user.hashed_password):
         raise HTTPException(
