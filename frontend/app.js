@@ -15,7 +15,7 @@ function translatePage() {
 }
 
 const state = {
-  backendUrl: localStorage.getItem("nexus_backend_url") || (window.location.origin.startsWith("http") ? window.location.origin : "http://localhost:8000"),
+  backendUrl: localStorage.getItem("nexus_backend_url") || "https://nexus-backend-production-29ef.up.railway.app",
   token: localStorage.getItem("nexus_token") || null,
   user: null,
   activeProject: null,
