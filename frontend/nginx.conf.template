@@ -16,7 +16,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location / {
+    location / / {
         try_files $uri $uri/ /index.html;
     }
 }
